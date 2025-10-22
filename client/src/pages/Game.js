@@ -120,7 +120,7 @@ function Game() {
       setRematchStatus(null);
       setOpponentRequestedRematch(false);
     },
-    [myPlayer]
+    [myUserId, players]
   );
 
   const handlePlayerDisconnected = useCallback(

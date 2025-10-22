@@ -26,17 +26,16 @@ function Register({ onAuth }) {
       });
 
       if(res.data.requiresVerification){
-         setSuccess(`Check your inbox! A verification link has been sent to ${email}. Please verify your email before logging in.`);
+          setSuccess(`Check your inbox! A verification link has been sent to ${email}. Please verify your email before logging in.`);
       }
       else{
-      localStorage.setItem('accessToken', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken);
-      setSuccess(`Registration successful! Redirecting...`);
-      setTimeout(() => {
-        onAuth();
-        navigate('/lobby');
-      }, 1000);
-
+        localStorage.setItem('accessToken', res.data.accessToken);
+        localStorage.setItem('refreshToken', res.data.refreshToken);
+        setSuccess(`Registration successful! Redirecting...`);
+        setTimeout(() => {
+          onAuth();
+          navigate('/lobby');
+        }, 1000);
       }
       
 
@@ -57,42 +56,52 @@ function Register({ onAuth }) {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {success && <p style={{ color: 'green' }}>{success}</p>}
       <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          value={username}
-          placeholder="Username"
-          onChange={(e) => {
-            setUsername(e.target.value);
-            setError('');
-            setSuccess(false);
-          }}
-          required
-        />
-        <br />
-        <input
-          type="email"
-          value={email}
-          placeholder="Email"
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setError('');
-            setSuccess(false);
-          }}
-          required
-        />
-        <br />
-        <input
-          type="password"
-          value={password}
-          placeholder="Password"
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setError('');
-            setSuccess(false);
-          }}
-          required
-        />
-        <br />
+        
+        {/* Input 1: Username */}
+        <div style={{ marginBottom: '15px' }}> {/* Adds 15px space below */}
+            <input
+              type="text"
+              value={username}
+              placeholder="Username"
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError('');
+                setSuccess(false);
+              }}
+              required
+            />
+        </div>
+
+        {/* Input 2: Email */}
+        <div style={{ marginBottom: '15px' }}> {/* Adds 15px space below */}
+            <input
+              type="email"
+              value={email}
+              placeholder="Email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError('');
+                setSuccess(false);
+              }}
+              required
+            />
+        </div>
+
+        {/* Input 3: Password */}
+        <div style={{ marginBottom: '20px' }}> {/* Adds slightly more space before button */}
+            <input
+              type="password"
+              value={password}
+              placeholder="Password"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError('');
+                setSuccess(false);
+              }}
+              required
+            />
+        </div>
+        
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Registering...' : 'Register'}
         </button>
