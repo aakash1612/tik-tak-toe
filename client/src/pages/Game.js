@@ -100,32 +100,28 @@ function Game() {
   const handleMoveMade = useCallback(({ board: newBoard }) => setBoard(newBoard), []);
   const handleTurnUpdate = useCallback(({ turn: newTurnUserId }) => setTurn(newTurnUserId), []);
 
-  // src/pages/Game.js (Around line 123)
+  const handleGameOver = useCallback(
+    ({ winner }) => {
+      setGameOverWinner(winner);
+      setShowGameOverModal(true);
 
-const handleGameOver = useCallback(
-    ({ winner }) => {
-      setGameOverWinner(winner);
-      setShowGameOverModal(true);
-
-      if (winner === 'Draw') {
-        setDrawsScore((prev) => prev + 1);
-      } else {
-        if (winner === 'X') {
-         // Increment the score for the 'X' player
-        setPlayer1Score((prev) => prev + 1);
-         } else if (winner === 'O') {
-          // Increment the score for the 'O' player
-         setPlayer2Score((prev) => prev + 1);
-          }
-      }
-      setGameStatusMessage('Game over. Please choose an option from the modal.');
-      setRematchStatus(null);
-      setOpponentRequestedRematch(false);
-    },
-    // ✅ The minimal list needed due to state setters
-    [setGameOverWinner, setShowGameOverModal, setDrawsScore, setPlayer1Score, setPlayer2Score, setGameStatusMessage, setRematchStatus, setOpponentRequestedRematch]
-);
-  
+      if (winner === 'Draw') {
+        setDrawsScore((prev) => prev + 1);
+      } else {
+        if (winner === 'X') {
+         // Increment the score for the 'X' player
+        setPlayer1Score((prev) => prev + 1);
+         } else if (winner === 'O') {
+          // Increment the score for the 'O' player
+         setPlayer2Score((prev) => prev + 1);
+          }
+      }
+      setGameStatusMessage('Game over. Please choose an option from the modal.');
+      setRematchStatus(null);
+      setOpponentRequestedRematch(false);
+    },
+    []
+  );
 
   const handlePlayerDisconnected = useCallback(
     ({ message }) => {
@@ -261,11 +257,7 @@ const handleGameOver = useCallback(
   };
 
   // Derived values
-  const turnPlayer = players.find((p) => p.userId === turn);
   const myTurn = turn === myUserId;
-  const displayTurnInfo = turnPlayer
-    ? `${turnPlayer.username} (${turnPlayer.symbol})`
-    : 'Waiting...';
 
   let displayMyScore = 0;
   let displayOpponentScore = 0;
