@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter , Routes, Route, Navigate, useParams } from 'react-router-dom';
 import './App.css';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -8,7 +8,7 @@ import ResetPassword from './pages/ResetPassword';
 import Lobby from './pages/Lobby';
 import Game from './pages/Game';
 import socket from './socket';
-
+import VerificationStatus from './pages/VerificationStatus';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('accessToken'));
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -73,7 +73,8 @@ function App() {
   }
 
   return (
-    <Router>
+    <BrowserRouter>
+    
       <Routes>
         <Route path="/register" element={<Register onAuth={handleAuth} />} />
         <Route path="/login" element={<Login onAuth={handleAuth} />} />
@@ -89,11 +90,12 @@ function App() {
             )
           }
         />
+        <Route path="/verification-status" element={<VerificationStatus />} />
         <Route path="/" element={<Navigate to={isAuthenticated ? "/lobby" : "/login"} />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 

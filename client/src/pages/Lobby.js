@@ -1,187 +1,229 @@
+// client/src/pages/Lobby.js - FINAL WORKING VERSION
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import socket from '../socket';
-import './Lobby.css';
+import AppHeader from '../pages/AppHeader';
+import './Lobby.css'; // Ensure you have your CSS for .modal-overlay, etc.
 
 const Lobby = () => {
-  const navigate = useNavigate();
-  const [activeGames, setActiveGames] = useState([]);
-  const [newGameName, setNewGameName] = useState('');
-  const [lobbyMessage, setLobbyMessage] = useState('');
-  const [myUserId, setMyUserId] = useState(socket.userId);
-  const [myUsername, setMyUsername] = useState(socket.username);
+    const navigate = useNavigate();
+    
+    // States
+    const [newGameName, setNewGameName] = useState('');
+    const [joinKey, setJoinKey] = useState('');
+    const [lobbyMessage, setLobbyMessage] = useState('Create a new private game or join a friend using a key.');
+    const [myUserId, setMyUserId] = useState(socket.userId);
+    const [myUsername, setMyUsername] = useState(socket.username);
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      console.log('Lobby.js: No accessToken found. Redirecting to login.');
-      setLobbyMessage('Authentication required. Please log in.');
-      navigate('/login');
-      return;
-    }
+    // State for the modal/waiting screen
+    const [roomKeyToShare, setRoomKeyToShare] = useState(null);
+    const [isWaitingModalOpen, setIsWaitingModalOpen] = useState(false);
 
-    // Ensure socket.auth.token is set to the current accessToken
-    if (socket.auth.token !== accessToken) {
-      socket.auth.token = accessToken;
-    }
+    // --- EFFECT HOOK: Handles Authentication and Socket Events ---
+    useEffect(() => {
+        const accessToken = localStorage.getItem('accessToken'); 
+        
+        if (!accessToken) {
+            navigate('/login');
+            return;
+        }
 
-    // Connect socket if not already connected
-    if (!socket.connected) {
-      socket.connect();
-      console.log('Lobby.js: Socket attempting to connect.');
-    }
+        if (socket.auth.token !== accessToken) {
+            socket.auth.token = accessToken;
+        }
+        if (!socket.connected) {
+            socket.connect();
+        }
 
-    // This listener ensures myUserId/Username are always up-to-date once auth is confirmed
-    const handleAuthSuccess = ({ userId, username }) => {
-      console.log("Lobby.js: Auth success received, updating myUserId/Username");
-      setMyUserId(userId);
-      setMyUsername(username);
-      if (socket.connected) {
-        socket.emit('request-active-games');
-        console.log(`Lobby: ${username} (${userId}) requested active games after auth-success.`);
-      }
+        const handleAuthSuccess = ({ userId, username }) => {
+            setMyUserId(userId);
+            setMyUsername(username);
+        };
+        
+        // This is the common navigation logic for P2 (joiner) and P1 (creator, triggered later).
+        const handleGameNavigation = ({ roomId }) => {
+            console.log(`Lobby: Navigating to game ${roomId}.`);
+            
+            // Clear modal state and navigate
+            setIsWaitingModalOpen(false);
+            setRoomKeyToShare(null);
+            setLobbyMessage('');
+            navigate(`/game/${roomId}`);
+        };
+
+        const handleJoinError = ({ message }) => {
+            console.error('Lobby: Join error:', message);
+            setLobbyMessage(`Error joining game: ${message}`);
+            // If an error happens while waiting, close the modal
+            setIsWaitingModalOpen(false); 
+            setRoomKeyToShare(null);
+        };
+
+        // --- Core Listeners ---
+        socket.on('auth-success', handleAuthSuccess);
+        
+        // P2 Navigation: When P2 joins, the server sends 'joined-game', then 'game-start'.
+        // This listener handles both P2 navigation and P1 navigation (when triggered by handleCreateGame).
+        socket.on('joined-game', handleGameNavigation);
+        
+        // P1 will manually attach a game-start listener inside handleCreateGame. 
+        // We DO NOT want a global listener here, as it conflicts with the modal.
+        // ❌ socket.on('game-start', handleGameNavigation); // REMOVED GLOBAL LISTENER
+        
+        socket.on('join-error', handleJoinError);
+
+        // Cleanup function
+        return () => {
+            socket.off('auth-success', handleAuthSuccess);
+            socket.off('joined-game', handleGameNavigation);
+            socket.off('game-start'); // Ensure ALL 'game-start' listeners are removed
+            socket.off('join-error', handleJoinError);
+            socket.off('game-created'); // Cleanup listener for key display
+        };
+    }, [navigate, myUserId, myUsername]);
+
+    // --- 1. CREATE GAME HANDLER ---
+    const handleCreateGame = () => {
+        // Ensure myUsername is current before creating the default name
+        const gameName = newGameName.trim() || `${myUsername || 'Host'}'s Game`; 
+        
+        if (!myUserId) { 
+            setLobbyMessage('Error: Not authenticated. Please log in again.');
+            return;
+        }
+        setLobbyMessage('Creating game...');
+        
+        // 1. Set up a temporary listener for 'game-created' (the key event).
+        socket.once('game-created', ({ roomId }) => {
+            // Display Key and Open Modal
+            setRoomKeyToShare(roomId); 
+            setIsWaitingModalOpen(true);
+            setLobbyMessage(`Room ${roomId} created. Share the key and wait...`);
+
+            // 2. CRUCIAL: Set up the *specific* listener for when the opponent joins (P1 navigation).
+            // This is a one-time listener that waits for the opponent to trigger 'game-start'.
+            socket.once('game-start', () => {
+                console.log(`Creator: Game started for room ${roomId}. Navigating.`);
+                // Call the global navigation handler, using the correct captured 'roomId'
+                // This will trigger navigation to /game/UFVNF
+                navigate(`/game/${roomId}`); 
+            });
+        });
+
+        // 3. Emit the request
+        socket.emit('create-game', { gameName });
     };
 
-    socket.on('auth-success', handleAuthSuccess);
-
-    if (socket.connected && myUserId) {
-      socket.emit('request-active-games');
-      console.log(`Lobby: ${myUsername} (${myUserId}) requested active games on mount.`);
-    }
-
-    socket.on('active-games-update', (games) => {
-      console.log('Lobby: Received active games update:', games);
-      setActiveGames(games);
-    });
-
-    socket.on('game-created', ({ roomId }) => {
-      console.log(`Lobby: Game created with ID: ${roomId}. Navigating to game.`);
-      setLobbyMessage('');
-      navigate(`/game/${roomId}`);
-    });
-
-    socket.on('joined-game', ({ roomId }) => {
-      console.log(`Lobby: Joined game with ID: ${roomId}. Navigating to game.`);
-      setLobbyMessage('');
-      navigate(`/game/${roomId}`);
-    });
-
-    socket.on('join-error', ({ message }) => {
-      console.error('Lobby: Join error:', message);
-      setLobbyMessage(`Error joining game: ${message}`);
-    });
-
-    // --- Cleanup function for useEffect ---
-    return () => {
-      socket.off('auth-success', handleAuthSuccess);
-      socket.off('active-games-update');
-      socket.off('game-created');
-      socket.off('joined-game');
-      socket.off('join-error');
+    // --- 2. JOIN GAME BY KEY HANDLER ---
+    const handleJoinByKey = () => {
+        const key = joinKey.trim().toUpperCase();
+        if (key.length !== 5) {
+            setLobbyMessage('Please enter a valid 5-character room key.');
+            return;
+        }
+        if (!myUserId) {
+            setLobbyMessage('Error: Not authenticated. Please log in again.');
+            return;
+        }
+        setLobbyMessage(`Attempting to join room ${key}...`);
+        
+        // This triggers 'joined-game' on server, which triggers the 'handleGameNavigation' listener in useEffect.
+        socket.emit('join-existing-game', { roomId: key });
     };
-  }, [navigate, myUserId, myUsername]);
 
-  const handleLogout = () => {
-    console.log('Lobby.js - Logging out. Clearing tokens and disconnecting socket.');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    if (socket.auth) socket.auth.token = null;
-    socket.disconnect();
-    navigate('/login');
-  };
+    // --- RENDER ---
+    return (
+        <>
+            <AppHeader 
+                username={myUsername} 
+                userId={myUserId} 
+            />
+            
+            {/* ---------------------------------------------------- */}
+            {/* 🔑 New Room Key Sharing Modal - Renders OVER the Lobby */}
+            {/* ---------------------------------------------------- */}
+            {isWaitingModalOpen && roomKeyToShare && (
+                <div className="modal-overlay">
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <h2 style={{ color: '#00ff66' }}>Room Created!</h2>
+                        <p style={{ marginTop: '10px' }}>Share this 5-character key with your opponent:</p>
+                        
+                        <h1 style={{ 
+                            fontSize: '3em', 
+                            color: '#007bff', 
+                            margin: '20px 0',
+                            letterSpacing: '5px' 
+                        }}>
+                            {roomKeyToShare}
+                        </h1>
+                        
+                        <p>Waiting for the second player to join...</p>
+                        
+                        <button 
+                            onClick={() => {
+                                setIsWaitingModalOpen(false);
+                                setRoomKeyToShare(null);
+                                setLobbyMessage('Waiting cancelled. Create or join a new room.');
+                                // ⚠️ Ensure the game-start listener is removed upon cancellation
+                                socket.off('game-start'); 
+                            }}
+                            className="logout-btn header-btn"
+                            style={{ marginTop: '20px' }}
+                        >
+                            Cancel & Return to Lobby
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            {/* --- Main Lobby Content --- */}
+            <div className="container">
+                <h2>Welcome to the Arena</h2>
+                <p>Hello, <strong>{myUsername || 'Guest'}</strong>! Create a new private game or join a friend!</p>
+                {lobbyMessage && <p className="status-message">{lobbyMessage}</p>}
+                
+                {/* Only show the options if the modal is NOT open */}
+                {!isWaitingModalOpen && (
+                    <div className="lobby-options-container">
+                        
+                        {/* 1. Create New Game */}
+                        <h3>1. Create New Game Room</h3>
+                        <div className="create-game-inputs" style={{ marginBottom: '30px' }}> 
+                            <input
+                                type="text"
+                                value={newGameName}
+                                // Placeholder indicates it's optional
+                                placeholder="Enter a name for your game (optional)"
+                                onChange={(e) => setNewGameName(e.target.value)}
+                            />
+                            <button onClick={handleCreateGame}>Create Game</button>
+                        </div>
+                        
+                        <hr style={{ margin: '2rem 0', borderColor: '#ccc' }} />
 
-  const handleCreateGame = () => {
-    console.log('Lobby.js - Attempting to create game. Current myUserId:', myUserId);
-    if (!newGameName.trim()) {
-      setLobbyMessage('Please enter a name for your game.');
-      return;
-    }
-    if (!myUserId) {
-      setLobbyMessage('Error: Not authenticated. Please log in again.');
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken && !socket.connected) {
-        socket.auth.token = accessToken;
-        socket.connect();
-        setLobbyMessage('Attempting to re-authenticate...');
-      } else {
-        navigate('/login');
-      }
-      return;
-    }
-    setLobbyMessage('Creating game...');
-    socket.emit('create-game', { gameName: newGameName.trim() });
-  };
-
-  const handleJoinGame = (roomId) => {
-    console.log('Lobby.js - Attempting to join game. Current myUserId:', myUserId);
-    if (!myUserId) {
-      setLobbyMessage('Error: Not authenticated. Please log in again.');
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken && !socket.connected) {
-        socket.auth.token = accessToken;
-        socket.connect();
-        setLobbyMessage('Attempting to re-authenticate...');
-      } else {
-        navigate('/login');
-      }
-      return;
-    }
-    setLobbyMessage(`Attempting to join game ${roomId}...`);
-    socket.emit('join-existing-game', { roomId });
-  };
-
-  return (
-    <div className="container">
-      <h2>Welcome to the Lobby</h2>
-      <p>Hello, <strong>{myUsername || 'Guest'}</strong>! Create a new game or join an active one!</p>
-      {lobbyMessage && <p className="status-message">{lobbyMessage}</p>}
-
-      <h3>Create New Game</h3>
-      <input
-        type="text"
-        placeholder="Enter a game name (e.g., My Awesome Game)"
-        value={newGameName}
-        onChange={(e) => {
-          setNewGameName(e.target.value);
-          setLobbyMessage('');
-        }}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            handleCreateGame();
-          }
-        }}
-      />
-      <button onClick={handleCreateGame}>Create Game</button>
-
-      <hr style={{ margin: '2rem 0' }} />
-
-      <h3>Active Games ({activeGames.length})</h3>
-      {activeGames.length === 0 ? (
-        <p>No active games available. Be the first to create one!</p>
-      ) : (
-        <ul className="game-list">
-          {activeGames.map((game) => (
-            <li key={game.id} className="game-item">
-              <span>
-                <strong>{game.name}</strong> (Players: {game.playerCount}/2)
-              </span>
-              {game.status === 'waiting' && game.playerCount < 2 ? (
-                <button onClick={() => handleJoinGame(game.id)}>Join</button>
-              ) : (
-                <span className="game-status">
-                  {game.status === 'in-progress' ? 'In Progress' : 'Full'}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <hr style={{ margin: '2rem 0' }} />
-
-      <button onClick={handleLogout} className="logout-btn">Logout</button>
-    </div>
-  );
+                        {/* 2. Join Game by Key */}
+                        <h3>2. Join Game by Key</h3>
+                        <div className="join-game-inputs">
+                            <input
+                                type="text"
+                                value={joinKey}
+                                placeholder="Enter 5-character Room Key (e.g., A1B2C)"
+                                maxLength={5}
+                                onChange={(e) => { 
+                                    setJoinKey(e.target.value.toUpperCase()); 
+                                    setLobbyMessage('');
+                                }}
+                            />
+                            <button onClick={handleJoinByKey} disabled={joinKey.length !== 5}>
+                                Join Game
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </>
+    );
 };
 
 export default Lobby;

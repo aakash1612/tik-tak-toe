@@ -7,6 +7,20 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+
+  emailVerificationToken: {
+    type: String,
+  },
+
+  emailVerificationExpires: {
+    type: Date,
+  },
+
   email: {
     type: String,
     required: true,
@@ -15,6 +29,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     match: [/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/, 'Please enter a valid email address']
   },
+  
   password: {
     type: String,
     required: true,

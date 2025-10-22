@@ -24,16 +24,23 @@ function Register({ onAuth }) {
         email,
         password,
       });
-    
+
+      if(res.data.requiresVerification){
+         setSuccess(`Check your inbox! A verification link has been sent to ${email}. Please verify your email before logging in.`);
+      }
+      else{
       localStorage.setItem('accessToken', res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.refreshToken);
-      
-      setSuccess(true);
-
+      setSuccess(`Registration successful! Redirecting...`);
       setTimeout(() => {
         onAuth();
         navigate('/lobby');
       }, 1000);
+
+      }
+      
+
+      
 
     } catch (err) {
       console.error('Registration error:', err);
@@ -48,7 +55,7 @@ function Register({ onAuth }) {
     <div className="container">
       <h2>Register</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>Registration successful! Redirecting...</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
       <form onSubmit={handleRegister}>
         <input
           type="text"

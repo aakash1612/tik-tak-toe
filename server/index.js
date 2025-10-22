@@ -13,9 +13,11 @@ const User = require('./models/User');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+const SERVER_URL = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: CLIENT_URL,
     credentials: true
 }));
 
@@ -35,7 +37,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: CLIENT_URL,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -81,12 +83,12 @@ io.on('connection', (socket) => {
         const { roomId, room } = gameManager.createRoom(socket.userId, socket.username, socket.id, gameName);
         socket.join(roomId);
         socket.emit('game-created', { roomId });
-        io.emit('active-games-update', gameManager.getAvailableRooms());
+        // io.emit('active-games-update', gameManager.getAvailableRooms());
         console.log(`Lobby: ${socket.id} (${socket.username}) created room ${roomId}`);
     });
 
     socket.on('join-existing-game', ({ roomId }) => {
-        const result = gameManager.joinRoom(roomId, socket.userId, socket.username, socket.id);
+        const result = gameManager.joinRoom(roomId.toUpperCase(), socket.userId, socket.username, socket.id);
         if (result.success) {
             socket.join(roomId);
             socket.emit('joined-game', { roomId });
@@ -109,7 +111,7 @@ io.on('connection', (socket) => {
                     console.log(`Game in room ${roomId} started.`);
                 }
             }
-            io.emit('active-games-update', gameManager.getAvailableRooms());
+            // io.emit('active-games-update', gameManager.getAvailableRooms());
         } else {
             socket.emit('join-error', { message: result.message });
             console.log(`Lobby: ${socket.id} (${socket.username}) failed to join room ${roomId}: ${result.message}`);
@@ -161,7 +163,7 @@ io.on('connection', (socket) => {
 
         if (result.isGameOver) {
             io.to(roomId).emit('game-over', { winner: result.winner });
-            io.emit('active-games-update', gameManager.getAvailableRooms()); // Update lobby
+            // io.emit('active-games-update', gameManager.getAvailableRooms()); // Update lobby
             console.log(`Game: Room ${roomId} game over. Winner: ${result.winner}`);
         } else {
             io.to(roomId).emit('turn-update', { turn: result.turn });
@@ -222,8 +224,8 @@ io.on('connection', (socket) => {
         console.log(`❌Disconnected: ${socket.id} (User: ${socket.username})`);
         const { roomDeleted, roomId: disconnectedFromRoomId, playerStillInRoom, remainingPlayerUserId, disconnectedUsername } = gameManager.handleDisconnect(socket.id);
 
-        if (roomDeleted) {
-            io.emit('active-games-update', gameManager.getAvailableRooms());
+        if (roomDeleted || (playerStillInRoom && disconnectedFromRoomId)) {
+            // io.emit('active-games-update', gameManager.getAvailableRooms());
             console.log(`Disconnected: Room ${disconnectedFromRoomId} was deleted.`);
         } else if (playerStillInRoom && disconnectedFromRoomId) {
             const currentRoom = gameManager.getRoom(disconnectedFromRoomId);

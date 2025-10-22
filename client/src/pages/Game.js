@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import socket from '../socket';
+import AppHeader from '../pages/AppHeader'; // your header component
 
 function Game() {
   const { roomId } = useParams();
@@ -8,126 +9,174 @@ function Game() {
   const messagesEndRef = useRef(null);
 
   const [board, setBoard] = useState(Array(9).fill(null));
-  const [symbol, setSymbol] = useState(null);
   const [turn, setTurn] = useState(null);
   const [players, setPlayers] = useState([]);
   const [gameStatusMessage, setGameStatusMessage] = useState('Connecting to game...');
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [gameOverWinner, setGameOverWinner] = useState(null);
-
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
   const [drawsScore, setDrawsScore] = useState(0);
-
   const [rematchStatus, setRematchStatus] = useState(null);
   const [opponentRequestedRematch, setOpponentRequestedRematch] = useState(false);
-
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
-
   const [myUserId, setMyUserId] = useState(socket.userId);
   const [myUsername, setMyUsername] = useState(socket.username);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const myPlayer = players.find(p => p.userId === myUserId);
-  const opponentPlayer = players.find(p => p.userId !== myUserId);
+  // Derived state
+  const myPlayer = players.find((p) => p.userId === myUserId);
+  const opponentPlayer = players.find((p) => p.userId !== myUserId);
 
+  // Animated scoreboard tracking
+  const [prevScores, setPrevScores] = useState({ wins: 0, losses: 0, draws: 0 });
   useEffect(() => {
-    const handleAuthSuccess = ({ userId, username }) => {
-      setMyUserId(userId);
-      setMyUsername(username);
-    };
+    if (
+      prevScores.wins !== player1Score ||
+      prevScores.losses !== player2Score ||
+      prevScores.draws !== drawsScore
+    ) {
+      const animatedEls = document.querySelectorAll('.score-value');
+      animatedEls.forEach((el) => {
+        el.classList.add('animate');
+        setTimeout(() => el.classList.remove('animate'), 400);
+      });
+      setPrevScores({
+        wins: player1Score,
+        losses: player2Score,
+        draws: drawsScore,
+      });
+    }
+  }, [player1Score, player2Score, drawsScore, prevScores]);
 
-    const handleConnect = () => {
-      socket.emit('request-game-state', roomId);
-    };
+  // Handlers
+  const handleAuthSuccess = useCallback(({ userId, username }) => {
+    setMyUserId(userId);
+    setMyUsername(username);
+  }, []);
 
-    const handlePlayersUpdate = (serverPlayers) => {
+  const handlePlayersUpdate = useCallback(
+    (serverPlayers) => {
       setPlayers(serverPlayers);
-      const currentPlayer = serverPlayers.find(p => p.userId === myUserId);
-      if (currentPlayer) {
-        setSymbol(currentPlayer.symbol);
-        setGameStatusMessage(
-          `You are: ${currentPlayer.symbol}. ${serverPlayers.length < 2 ? 'Waiting for opponent...' : ''}`
-        );
-      }
-    };
+      setIsLoading(false);
 
-    const handleGameStart = ({ board: initialBoard, turn: initialTurn, players: serverPlayers }) => {
+      const currentPlayer = serverPlayers.find((p) => p.userId === myUserId);
+      if (currentPlayer) {
+        setGameStatusMessage(
+          `You are: ${currentPlayer.symbol}. ${
+            serverPlayers.length < 2 ? 'Waiting for opponent...' : ''
+          }`
+        );
+      } else if (serverPlayers.length === 2 && !currentPlayer) {
+        setGameStatusMessage('Error: You are not a player in this room. Returning to lobby.');
+        setTimeout(() => navigate('/lobby'), 3000);
+      }
+    },
+    [navigate, myUserId]
+  );
+
+  const handleGameStart = useCallback(
+    ({ board: initialBoard, turn: initialTurn, players: serverPlayers }) => {
       setBoard(initialBoard);
       setTurn(initialTurn);
       setPlayers(serverPlayers);
-      const currentPlayer = serverPlayers.find(p => p.userId === myUserId);
-      if (currentPlayer) {
-        setSymbol(currentPlayer.symbol);
-        setGameStatusMessage(`You are: ${currentPlayer.username} (${currentPlayer.symbol})`);
-      }
       setShowGameOverModal(false);
       setRematchStatus(null);
       setOpponentRequestedRematch(false);
-    };
 
-    const handleMoveMade = ({ board: newBoard }) => setBoard(newBoard);
-    const handleTurnUpdate = ({ turn: newTurnUserId }) => setTurn(newTurnUserId);
+      const currentPlayer = serverPlayers.find((p) => p.userId === myUserId);
+      if (currentPlayer) {
+        setGameStatusMessage(
+        `You are: ${currentPlayer.symbol}. ${
+         serverPlayers.length < 2 ? 'Waiting for opponent...' : ''
+          }`
+        );
+      }
+    },
+    [myUserId]
+  );
 
-    const handleGameOver = ({ winner }) => {
+  const handleMoveMade = useCallback(({ board: newBoard }) => setBoard(newBoard), []);
+  const handleTurnUpdate = useCallback(({ turn: newTurnUserId }) => setTurn(newTurnUserId), []);
+
+  const handleGameOver = useCallback(
+    ({ winner }) => {
       setGameOverWinner(winner);
       setShowGameOverModal(true);
 
       if (winner === 'Draw') {
-        setDrawsScore(prev => prev + 1);
-      } else if (winner === 'X') {
-        setPlayer1Score(prev => prev + 1);
-      } else if (winner === 'O') {
-        setPlayer2Score(prev => prev + 1);
+        setDrawsScore((prev) => prev + 1);
+      } else {
+        if (winner === 'X') {
+         // Increment the score for the 'X' player
+        setPlayer1Score((prev) => prev + 1);
+         } else if (winner === 'O') {
+          // Increment the score for the 'O' player
+         setPlayer2Score((prev) => prev + 1);
+          }
       }
-
-      setBoard(Array(9).fill(null));
-      setTurn(null);
-      setSymbol(null);
-      setGameStatusMessage('Game over. Please choose an option from the popup.');
+      setGameStatusMessage('Game over. Please choose an option from the modal.');
       setRematchStatus(null);
       setOpponentRequestedRematch(false);
-    };
+    },
+    [myPlayer]
+  );
 
-    const handlePlayerDisconnected = ({ message }) => {
-      setGameStatusMessage(message);
-      setBoard(Array(9).fill(null));
+  const handlePlayerDisconnected = useCallback(
+    ({ message }) => {
+      setGameStatusMessage(message + ' Returning to lobby in 5 seconds.');
       setTurn(null);
-      setPlayers([]);
-      setSymbol(null);
       setShowGameOverModal(false);
       setRematchStatus(null);
       setOpponentRequestedRematch(false);
-    };
+      setTimeout(() => navigate('/lobby'), 5000);
+    },
+    [navigate]
+  );
 
-    const handleMoveError = ({ message }) => {
+  const handleMoveError = useCallback(
+    ({ message }) => {
       setGameStatusMessage(`Error: ${message}`);
       setTimeout(
         () =>
-          setGameStatusMessage(
-            s => (s ? `You are: ${s}` : 'Waiting for opponent...')
+          setGameStatusMessage((s) =>
+            s.includes('Error') ? `Your turn, ${myUsername}!` : s
           ),
         3000
       );
-    };
+    },
+    [myUsername]
+  );
 
-    const handleRematchStatus = ({ message, status }) => {
-      setRematchStatus({ message, status });
-      setOpponentRequestedRematch(status === 'opponent-requested');
-    };
+  const handleRematchStatus = useCallback(({ message, status }) => {
+    setRematchStatus({ message, status });
+    setOpponentRequestedRematch(status === 'opponent-requested');
+  }, []);
 
-    const handleReceiveMessage = (msg) =>
-      setMessages(prevMessages => [...prevMessages, msg]);
+  const handleReceiveMessage = useCallback(
+    (msg) => setMessages((prevMessages) => [...prevMessages, msg]),
+    []
+  );
 
+  // Socket setup
+  useEffect(() => {
     if (!roomId) {
       navigate('/lobby');
       return;
     }
 
-    if (socket.connected) socket.emit('request-game-state', roomId);
+    if (!socket.connected) {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        navigate('/login');
+        return;
+      }
+      socket.auth.token = accessToken;
+      socket.connect();
+    }
 
     socket.on('auth-success', handleAuthSuccess);
-    socket.on('connect', handleConnect);
     socket.on('players-update', handlePlayersUpdate);
     socket.on('game-start', handleGameStart);
     socket.on('move-made', handleMoveMade);
@@ -140,7 +189,6 @@ function Game() {
 
     return () => {
       socket.off('auth-success', handleAuthSuccess);
-      socket.off('connect', handleConnect);
       socket.off('players-update', handlePlayersUpdate);
       socket.off('game-start', handleGameStart);
       socket.off('move-made', handleMoveMade);
@@ -151,31 +199,48 @@ function Game() {
       socket.off('rematch-status', handleRematchStatus);
       socket.off('receive-message', handleReceiveMessage);
     };
-  }, [roomId, navigate, myUserId]);
+  }, [
+    roomId,
+    navigate,
+    handleAuthSuccess,
+    handlePlayersUpdate,
+    handleGameStart,
+    handleMoveMade,
+    handleTurnUpdate,
+    handleGameOver,
+    handlePlayerDisconnected,
+    handleMoveError,
+    handleRematchStatus,
+    handleReceiveMessage,
+  ]);
 
   useEffect(() => {
-    if (messagesEndRef.current)
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (myUserId && socket.connected && roomId) {
+      socket.emit('join-game-channel', roomId);
+      socket.emit('request-game-state', roomId);
+    }
+  }, [myUserId, roomId]);
+
+  // Scroll chat
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // --- ACTIONS ---
   const handleClick = (index) => {
-    if (board[index] || turn !== myUserId || !symbol || showGameOverModal) {
-      let msg = '';
-      if (showGameOverModal) msg = 'Game is over!';
-      else if (board[index]) msg = 'Cell already taken!';
-      else if (turn !== myUserId) msg = "It's not your turn!";
-      else if (!symbol) msg = 'Waiting for your symbol assignment (or opponent).';
-      setGameStatusMessage(msg);
-      setTimeout(
-        () =>
-          setGameStatusMessage(
-            s => (s ? `You are: ${s}` : 'Waiting for opponent...')
-          ),
-        3000
-      );
+    if (showGameOverModal) {
+      setGameStatusMessage('Game is over! Use the modal to proceed.');
+    } else if (board[index]) {
+      setGameStatusMessage('Cell already taken!');
+    } else if (turn !== myUserId) {
+      setGameStatusMessage("It's not your turn!");
+    } else if (players.length < 2) {
+      setGameStatusMessage('Waiting for opponent...');
+    } else {
+      socket.emit('make-move', { roomId, index });
       return;
     }
-    socket.emit('make-move', { roomId, index });
+    setTimeout(() => setGameStatusMessage(''), 2000);
   };
 
   const handleRematchRequest = () => {
@@ -191,11 +256,11 @@ function Game() {
     }
   };
 
-  const turnPlayer = players.find(p => p.userId === turn);
+  // Derived values
+  const turnPlayer = players.find((p) => p.userId === turn);
+  const myTurn = turn === myUserId;
   const displayTurnInfo = turnPlayer
     ? `${turnPlayer.username} (${turnPlayer.symbol})`
-    : turn
-    ? 'Looking up user...'
     : 'Waiting...';
 
   let displayMyScore = 0;
@@ -208,142 +273,167 @@ function Game() {
     displayOpponentScore = player1Score;
   }
 
-  // client/src/pages/Game.js
-// ... (all the logic, state, and handlers above) ...
+  if (isLoading || !myUserId) {
+    return (
+      <>
+        <AppHeader username={myUsername} userId={myUserId} />
+        <div className="loading-screen" style={{ textAlign: 'center', padding: '50px' }}>
+          <p>Authenticating and loading game...</p>
+        </div>
+      </>
+    );
+  }
 
-return (
-  <div className="App">
-    <h1>🎮 Multiplayer Tic-Tac-Toe</h1>
+  // --- RENDER ---
+  return (
+    <div className="App">
+      <AppHeader username={myUsername} userId={myUserId} />
 
-    {/* This is the main Flexbox container for side-by-side content */}
-    <div className="game-layout">
-
-      {/* This is the 65% left column for all game-related UI */}
-      <div className="game-left">
-        <p>
-          You are: <strong>{myUsername || '...'} ({symbol || '...'})</strong>
-        </p>
-
-        <div className="player-scores">
-          <span>{myUsername || 'You'}: <strong>{displayMyScore}</strong></span> |
-          <span> {opponentPlayer ? opponentPlayer.username : 'Opponent'}: <strong>{displayOpponentScore}</strong></span> |
-          <span> Draws: <strong>{drawsScore}</strong></span>
+      <div className="game-container">
+        {/* ✅ Turn Indicator */}
+        <div className={`turn-indicator ${myTurn ? 'your-turn' : 'opponent-turn'}`}>
+          {myTurn ? '🟢 Your Turn' : '🔴 Opponent’s Turn'}
         </div>
 
-        {players.length === 2 && (
-          <p className={`turn-indicator ${turn === myUserId ? 'my-turn' : 'opponent-turn'}`}>
-            Turn: <strong>{displayTurnInfo}</strong>
-          </p>
-        )}
+        <div className="game-layout">
+          <div className="game-left">
+           <h1 className="game-title">
+               {myUsername} ({myPlayer?.symbol}) vs {opponentPlayer?.username || 'Opponent'} ({opponentPlayer?.symbol})
+           </h1>
+            <p className="status-message">{gameStatusMessage}</p>
 
-        <div className="board">
-          {board.map((cell, index) => (
-            <div
-              className={`cell ${cell === 'X' ? 'X' : ''} ${cell === 'O' ? 'O' : ''}`}
-              key={index}
-              onClick={() => handleClick(index)}
-            >
-              {cell}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* This is the 35% right column for the chatbox */}
-      <div className="game-right">
-        <div className="chat-container">
-          <div className="messages-display">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`message-item ${msg.userId === myUserId ? 'my-message' : 'opponent-message'}`}
-              >
-                <strong>{msg.username}:</strong> {msg.message}
-                <span className="timestamp">
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </span>
+            {/* ✅ Scoreboard */}
+            <div className="player-scores">
+              <div className="score-item score-win">
+                <span className="score-label">🏆 Wins</span>
+                <span className="score-value">{displayMyScore}</span>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
+
+              <div className="score-item score-loss">
+                <span className="score-label">❌ Losses</span>
+                <span className="score-value">{displayOpponentScore}</span>
+              </div>
+
+              <div className="score-item score-draw">
+                <span className="score-label">🤝 Draws</span>
+                <span className="score-value">{drawsScore}</span>
+              </div>
+            </div>
+
+            {/* ✅ Game Board */}
+            <div className="board">
+              {board.map((cell, index) => (
+                <div
+                  className={`cell ${cell === 'X' ? 'X' : ''} ${cell === 'O' ? 'O' : ''}`}
+                  key={index}
+                  onClick={() => handleClick(index)}
+                >
+                  {cell}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <form onSubmit={handleSendMessage} className="message-input-form">
-            <input
-              type="text"
-              value={currentMessage}
-              onChange={(e) => setCurrentMessage(e.target.value)}
-              placeholder="Type a message..."
-              disabled={!socket.connected}
-            />
-            <button type="submit" disabled={!socket.connected || !currentMessage.trim()}>
-              Send
-            </button>
-          </form>
+          {/* ✅ Chat */}
+          <div className="game-right">
+            <div className="chat-container">
+              <h3>In-Game Chat</h3>
+              <div className="messages-display">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`message-item ${
+                      msg.userId === myUserId ? 'my-message' : 'opponent-message'
+                    }`}
+                  >
+                    {msg.message}
+                    <span className="timestamp small-timestamp">
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <form onSubmit={handleSendMessage} className="message-input-form">
+                <input
+                  type="text"
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  disabled={!socket.connected || players.length < 2}
+                />
+                <button
+                  type="submit"
+                  disabled={!socket.connected || !currentMessage.trim() || players.length < 2}
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-      </div>
 
-    </div> {/* End of .game-layout */}
-
-    {/* The Game Over Modal stays outside the main layout container */}
-    {showGameOverModal && (
-      <div className="game-over-modal-overlay">
-        <div className="game-over-modal">
-          <h2>Game Over!</h2>
-          {gameOverWinner === 'Draw' ? (
-            <h3 className="draw-text">It's a Draw!</h3>
-          ) : (
-            <>
-              {myPlayer?.symbol === gameOverWinner ? (
-                <h3 className="winner-text">You Win! 🎉</h3>
+        {/* ✅ Game Over Modal */}
+        {showGameOverModal && (
+          <div className="game-over-modal-overlay">
+            <div className="game-over-modal">
+              <h2>Game Over!</h2>
+              {gameOverWinner === 'Draw' ? (
+                <h3 className="draw-text">It's a Draw!</h3>
               ) : (
-                <h3 className="loser-text">You Lost! 😟</h3>
+                <>
+                  {myPlayer?.symbol === gameOverWinner ? (
+                    <h3 className="winner-text">You Win! 🎉</h3>
+                  ) : (
+                    <h3 className="loser-text">You Lost! 😟</h3>
+                  )}
+                  <p>
+                    Winner:{' '}
+                    <strong>
+                      {players.find((p) => p.symbol === gameOverWinner)?.username || 'Unknown'}
+                    </strong>
+                  </p>
+                </>
               )}
-              <p>
-                Winner: <strong>
-                  {players.find(p => p.symbol === gameOverWinner)?.username || 'Unknown'} (
-                  {players.find(p => p.symbol === gameOverWinner)?.symbol || ''}
-                )
-                </strong>
-              </p>
-            </>
-          )}
 
-          <div className="modal-actions">
-            {players.length === 2 && (
-              <button
-                onClick={handleRematchRequest}
-                disabled={rematchStatus?.status === 'requesting'}
-                style={{ marginRight: '10px' }}
-              >
-                {rematchStatus?.status === 'requesting' ? 'Requesting...' : opponentRequestedRematch ? 'Accept Rematch' : 'Play Again'}
-              </button>
-            )}
-            <button
-              onClick={() => {
-                setShowGameOverModal(false);
-                navigate('/lobby');
-              }}
-            >
-              Return to Lobby
-            </button>
+              <div className="modal-actions">
+                {players.length === 2 && (
+                  <button
+                    onClick={handleRematchRequest}
+                    disabled={rematchStatus?.status === 'requesting'}
+                    className="rematch-btn"
+                  >
+                    {rematchStatus?.status === 'requesting'
+                      ? 'Requesting...'
+                      : opponentRequestedRematch
+                      ? 'Accept Rematch'
+                      : 'Play Again'}
+                  </button>
+                )}
+                <button onClick={() => navigate('/lobby')} className="lobby-btn">
+                  Return to Lobby
+                </button>
+              </div>
+
+              {rematchStatus && rematchStatus.status !== 'requesting' && (
+                <p className="rematch-message">{rematchStatus.message}</p>
+              )}
+              {rematchStatus?.status === 'requesting' && (
+                <p className="rematch-message">Waiting for opponent to accept rematch...</p>
+              )}
+              {opponentRequestedRematch && rematchStatus?.status === 'opponent-requested' && (
+                <p className="rematch-message">{rematchStatus.message}</p>
+              )}
+            </div>
           </div>
-
-          {rematchStatus && rematchStatus.status !== 'requesting' && rematchStatus.status !== 'opponent-requested' && (
-            <p className="rematch-message">{rematchStatus.message}</p>
-          )}
-          {rematchStatus?.status === 'requesting' && (
-            <p className="rematch-message">Waiting for opponent to accept rematch...</p>
-          )}
-          {opponentRequestedRematch && rematchStatus?.status === 'opponent-requested' && (
-            <p className="rematch-message">{rematchStatus.message}</p>
-          )}
-        </div>
+        )}
       </div>
-    )}
-  </div>
-);
-
-// ... (rest of the file) ...
+    </div>
+  );
 }
 
 export default Game;

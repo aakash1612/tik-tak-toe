@@ -1,30 +1,101 @@
-/* --- Core App Layout --- */
-.App {
-    text-align: center;
+/* ========================================================================= */
+/* 1. GLOBAL RESET AND BASE STYLES */
+/* ========================================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
     background-color: #f0f2f5;
     color: #333;
     font-family: Arial, sans-serif;
     min-height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
+    /* keep global scroll hidden so page doesn't scroll; chat will scroll */
+    overflow-y: hidden;
+}
+
+/* --- Core App Layout --- */
+.App {
+    background-color: #f0f2f5;
+    color: #333;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
+    padding: 0;
 }
 
-h1 {
-    color: #007bff;
-    margin-bottom: 20px;
+h1 { color: #007bff; margin-bottom: 20px; font-size: 2em; }
+h2 { color: #007bff; margin-bottom: 25px; font-size: 2em; }
+
+/* ========================================================================= */
+/* 2. APP HEADER & MODAL STYLES */
+/* ========================================================================= */
+
+.app-header {
+    position: sticky; top: 0; z-index: 1000;
+    background-color: #13131b;
+    padding: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* --- Game Layout (Side-by-Side) --- */
+.header-content {
+    max-width: 1000px; margin: 0 auto; padding: 0 20px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.logo { color: #00ff66; font-size: 1.8rem; font-weight: bold; }
+.user-controls { display: flex; align-items: center; gap: 15px; }
+.user-greeting { color: #a8a8c0; font-size: 1rem; padding: 0 5px; }
+
+.header-btn {
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, transform 0.1s;
+    border: none;
+}
+.logout-btn { background-color: #ff4b5c; color: #fff; }
+.profile-btn { background-color: #ffdd57; color: #1e1e2f; }
+
+/* Modal Styling */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1001;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #1f1f38; color: #f5f5f5;
+    padding: 30px; border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ff66;
+    position: relative;
+}
+
+/* ========================================================================= */
+/* 3. GAME & AUTH STYLES */
+/* ========================================================================= */
+
 .game-layout {
     display: flex;
     justify-content: center;
-    align-items: stretch; /* This makes the children fill the height of the container */
+    align-items: stretch;
     width: 100%;
-    flex-grow: 1;
+    /* fixed viewport-based height so child 100% heights work */
+    height: calc(100vh - 80px);
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
 }
 
 .game-left {
@@ -38,10 +109,13 @@ h1 {
     flex: 0 0 35%;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    /* ensures chat-container can be 100% of this column */
+    height: 100%;
+    max-height: 650px;
+    flex-grow: 1;
 }
 
-/* --- Game Board and Cell Styles --- */
+/* --- Game Board --- */
 .board {
     display: grid;
     grid-template-columns: repeat(3, 120px);
@@ -55,447 +129,428 @@ h1 {
 }
 
 .cell {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 3em;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
+    width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 3em; font-weight: bold; cursor: pointer;
+    background-color: #ffffff; border: 1px solid #ccc;
     border-radius: 5px;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-    box-sizing: border-box;
 }
 
-.cell:hover {
-    background-color: #f0f0f0;
-    transform: scale(1.02);
-}
+.cell.X { color: #007bff; }
+.cell.O { color: #dc3545; }
 
-.cell:active {
-    transform: scale(0.98);
-}
-
-.cell.X {
-    color: #007bff;
-}
-
-.cell.O {
-    color: #dc3545;
-}
-
-/* --- Other General Styles (Forms, Buttons, Links) --- */
+/* --- Auth/General Container --- */
 .container {
-    background-color: #fff;
-    padding: 30px 40px;
-    border-radius: 10px;
+    background-color: #fff; color: #333;
+    padding: 30px 40px; border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    max-width: 450px;
-    width: 90%;
-    margin: 20px auto;
+    max-width: 450px; margin: 20px auto;
 }
 
-.container h2 {
-    color: #007bff;
-    margin-bottom: 25px;
-    font-size: 2em;
-}
-
-.container form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.container input[type="text"],
-.container input[type="email"],
-.container input[type="password"] {
-    padding: 12px 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1em;
-    width: 100%;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.container input[type="text"]:focus,
-.container input[type="email"]:focus,
-.container input[type="password"]:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-    outline: none;
+.container input {
+    background-color: #fff; color: #333; border: 1px solid #ccc;
+    padding: 12px 15px; border-radius: 8px; font-size: 1em; width: 100%;
 }
 
 .container button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: bold;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    margin-top: 10px;
+    background-color: #007bff; color: white; padding: 12px 25px; border-radius: 8px; margin-top: 10px;
 }
 
-.container button[type="submit"]:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-}
+/* ========================================================================= */
+/* 4. CHAT SECTION WITH GUARANTEED SCROLLBAR */
+/* ========================================================================= */
 
-.container button[type="submit"]:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    transform: none;
-}
 
-.container p {
-    margin-top: 20px;
-    font-size: 0.95em;
-    color: #555;
-}
-
-.container p a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.container p a:hover {
-    text-decoration: underline;
-}
-
-.error-message {
-    color: #dc3545;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 0.9em;
-}
-
-.success-message {
-    color: #28a745;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 0.9em;
-}
-
-.status-message {
-    color: #007bff;
-    background-color: #e0f2ff;
-    border: 1px solid #b3d9ff;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 0.9em;
-}
-
-hr {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-    margin: 25px 0;
-}
-
-/* --- Game Over Modal Styles --- */
-.game-over-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-}
-
-.game-over-modal {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    text-align: center;
-    max-width: 450px;
-    width: 90%;
-    transform: scale(0.9);
-    animation: modal-appear 0.3s forwards ease-out;
-    border: 2px solid #ddd;
-    position: relative;
-    overflow: hidden;
-}
-
-@keyframes modal-appear {
-    from { opacity: 0; transform: scale(0.7); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.game-over-modal h2 {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 2.2em;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.game-over-modal h3 {
-    font-size: 2em;
-    margin-bottom: 10px;
-}
-
-.winner-text {
-    color: #28a745;
-    font-weight: bold;
-    animation: pulse-glow 1.5s infinite alternate;
-}
-
-.loser-text {
-    color: #dc3545;
-    font-weight: bold;
-}
-
-.draw-text {
-    color: #6c757d;
-    font-weight: bold;
-}
-
-@keyframes pulse-glow {
-    from { text-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
-    to { text-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 20px rgba(40, 167, 69, 0.6); }
-}
-
-.game-over-modal p {
-    margin-bottom: 20px;
-    color: #555;
-    font-size: 1.1em;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 25px;
-}
-
-.modal-actions button {
-    background-color: #007bff;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: bold;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.modal-actions button:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-}
-
-.modal-actions button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.rematch-message {
-    margin-top: 15px;
-    font-style: italic;
-    color: #555;
-    font-size: 0.95em;
-}
-
-/* --- Player Scores Display --- */
-.player-scores {
-    margin-top: 15px;
-    margin-bottom: 20px;
-    font-size: 1.2em;
-    color: #333;
-    background-color: #e9ecef;
-    padding: 10px 15px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.player-scores span {
-    font-weight: normal;
-}
-
-.player-scores strong {
-    color: #007bff;
-    font-size: 1.1em;
-}
-
-/* --- Visual Turn Indicator --- */
-.turn-indicator {
-    margin-top: 10px;
-    font-size: 1.3em;
-    padding: 8px 15px;
-    border-radius: 8px;
-    display: inline-block;
-    min-width: 200px;
-    text-align: center;
-    font-weight: bold;
-    transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
-}
-
-.turn-indicator.my-turn {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #28a745;
-    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
-}
-
-.turn-indicator.opponent-turn {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #dc3545;
-}
-
-/* --- In-Game Chat --- */
 .chat-container {
-    background-color: #f0f2f5;
-    border: 1px solid #e0e2e5;
-    border-radius: 10px;
-    margin-top: 30px;
+    background-color: #4d5149;
+    border: 2px solid #0e0e0e;
+    border-radius: 12px;
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    max-height: 600px;
+    min-height: 300px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
+    box-shadow: 0 4px 12px rgba(80, 72, 72, 0.08);
     flex-grow: 1;
+    padding: 0;
 }
 
+/* ✅ Scrollable Messages Area */
 .messages-display {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     flex-grow: 1;
-    padding: 15px;
     overflow-y: auto;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e2e5;
-    max-height: 700px;
+    overflow-x: hidden;
+    height: 100%;
+    padding: 15px;
+    background-color: #1d211c;
+    border-bottom: 1px solid #0e0e0e;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable both-edges;
 }
 
+/* ✅ Modern Scrollbar Styling */
+.messages-display::-webkit-scrollbar {
+    width: 14px; /* wider for visibility */
+}
+
+.messages-display::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-display::-webkit-scrollbar-thumb {
+    background: rgba(133, 143, 155, 0.6);
+    border-radius: 10px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    transition: background 0.3s ease;
+}
+
+.messages-display::-webkit-scrollbar-thumb:hover {
+    background: rgba(133, 143, 155, 0.6);
+}
+.chat-container h3 {
+    text-align: center;
+    padding: 10px; 
+    margin: 0; 
+    color: #fff;
+    background-color: #4d5149; 
+    flex-shrink: 0; 
+}
+.message-bubble {
+  max-width: 70%; /* message width limited to 70% of chat area */
+  word-wrap: break-word;
+  padding: 10px 14px;
+  margin: 6px 0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #000;
+  background-color: #e6f3ff;
+}
+/* Firefox Scrollbar */
+
+/* ✅ Chat Messages */
 .message-item {
     margin-bottom: 10px;
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 15px;
-    max-width: 55%;
+    max-width: 70%;
     word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
     font-size: 0.95em;
     line-height: 1.4;
-}
-
-.message-item strong {
-    font-weight: bold;
-    margin-right: 5px;
-}
-
-.message-item .timestamp {
-    display: block;
-    font-size: 0.7em;
-    color: #888;
-    text-align: right;
-    margin-top: 3px;
+    display: flex;
+    flex-direction: column;
 }
 
 .my-message {
     background-color: #dcf8c6;
+    color: #333;
     align-self: flex-end;
-    margin-left: auto;
-    border-bottom-right-radius: 2px;
+    text-align: right;
+    border-bottom-right-radius: 4px;
 }
 
 .opponent-message {
     background-color: #ffffff;
-    border: 1px solid #e0e0e0;
+    color: #333;
     align-self: flex-start;
-    margin-right: auto;
-    border-bottom-left-radius: 2px;
+    border: 1px solid #e0e0e0;
+    border-bottom-left-radius: 4px;
 }
 
+.message-item .small-timestamp {
+    display: block;
+    font-size: 0.7em;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* ✅ Chat Input */
 .message-input-form {
     display: flex;
-    padding: 15px;
-    background-color: #f0f2f5;
+    padding: 10px;
+    background-color: #fff;
     border-top: 1px solid #e0e2e5;
+    border-radius: 0 0 10px 10px;
+    align-items: center;
+    gap: 8px;
 }
 
 .message-input-form input {
     flex-grow: 1;
-    padding: 10px 15px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 20px;
-    margin-right: 10px;
+    border-radius: 8px;
     font-size: 1em;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.message-input-form input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .message-input-form button {
     background-color: #007bff;
     color: white;
-    padding: 10px 20px;
+    padding: 10px 18px;
     border: none;
-    border-radius: 20px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1em;
     font-weight: bold;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 .message-input-form button:hover {
     background-color: #0056b3;
-    transform: translateY(-1px);
+    transform: scale(1.05);
 }
 
-.message-input-form button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    transform: none;
+/* ========================================================================= */
+/* ✅ SCOREBOARD (Glass Card Style) */
+/* ========================================================================= */
+
+.player-scores {
+    background: rgba(19, 19, 27, 0.9);
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    padding: 15px 25px;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    gap: 25px;
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+    backdrop-filter: blur(6px);
+    transition: transform 0.2s;
 }
 
-/* Ensure board clicks are prevented when modal is open */
-.game-over-modal-overlay + .App .board .cell {
-    pointer-events: none; /* Disable clicks on board behind modal */
+.player-scores:hover {
+    transform: scale(1.03);
 }
 
-/* --- Side by side layout for Game + Chat --- */
+.score-item {
+    text-align: center;
+}
+
+.score-label {
+    font-size: 0.9rem;
+    color: #aaa;
+    display: block;
+}
+
+.score-value {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #00ff99;
+}
+
+/* 🏆 Win */
+.score-win .score-value {
+    color: #00ff99;
+}
+
+/* ❌ Loss */
+.score-loss .score-value {
+    color: #ff4b5c;
+}
+
+/* 🤝 Draw */
+.score-draw .score-value {
+    color: #ffd700;
+}
+
+/* ========================================================================= */
+/* ✅ TURN INDICATOR */
+/* ========================================================================= */
+
+.turn-indicator {
+    position: absolute;
+    top: 20px;
+    left: 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+/* ✅ Color states */
+.turn-indicator.your-turn {
+    background: rgba(0, 255, 100, 0.2);
+    border: 2px solid #00ff88;
+    color: #00ff88;
+    box-shadow: 0 0 15px #00ff88;
+}
+
+.turn-indicator.opponent-turn {
+    background: rgba(255, 70, 70, 0.2);
+    border: 2px solid #ff4b5c;
+    color: #ff4b5c;
+    box-shadow: 0 0 15px #ff4b5c;
+}
+
+/* ========================================================================= */
+/* ✅ SCOREBOARD ANIMATION */
+/* ========================================================================= */
+
+@keyframes countUp {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.score-value {
+    font-size: 1.6rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.score-value.animate {
+    animation: countUp 0.4s ease-in-out;
+}
+
+/* ========================================================================= */
+/* ✅ REPOSITION CONTAINER TO SUPPORT TURN INDICATOR */
+/* ========================================================================= */
+
+.game-container {
+    position: relative; /* So .turn-indicator can sit inside */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* ========================================================================= */
+/* ✅ FIX 1: TURN INDICATOR NEUTRAL STATE */
+/* ========================================================================= */
+.turn-indicator.neutral {
+    background: rgba(128, 128, 128, 0.3);
+    border: 2px solid rgba(180, 180, 180, 0.8);
+    color: #dcdcdc;
+    box-shadow: 0 0 12px rgba(180, 180, 180, 0.4);
+}
+
+/* ========================================================================= */
+/* ✅ FIX 2: CHAT MESSAGE WIDTH + ALIGNMENT */
+/* ========================================================================= */
+
+/* Keep chat container fixed width; prevent expansion */
 
 
-
-
-
-
-.chat-box {
-    height: 100%;
-    width: 100%;
-    border: 1px solid #ccc;
-    padding: 10px;
+/* Limit message width to 70% of container */
+.message-item {
+    max-width: 70%;
+    width: fit-content;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    border-radius: 15px;
+    padding: 10px 14px;
     margin-bottom: 10px;
-    overflow-y: auto;
-    max-height: 70vh;
-    background: #fafafa;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+/* Center text inside each message bubble */
+.message-item p, 
+.message-item span {
+    color: #000;
+    text-align: center;
+}
+
+/* User messages right aligned, opponent left */
+.my-message {
+    align-self: flex-end;
+    background-color: #dcf8c6;
+    border-bottom-right-radius: 5px;
+}
+
+.opponent-message {
+    align-self: flex-start;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-bottom-left-radius: 5px;
+}
+
+
+
+/* ========================================================================= */
+/* ✅ FIX 3: GAME OVER MODAL ON TOP */
+/* ========================================================================= */
+.game-over-modal-overlay {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 99999 !important; /* ensure it's above everything */
+}
+
+.game-over-modal {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 30px 40px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.game-over-modal h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-weight: bold;
+}
+
+.rematch-btn {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.rematch-btn:hover {
+    background-color: #27ae60;
+}
+
+.lobby-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.lobby-btn:hover {
+    background-color: #2980b9;
 }

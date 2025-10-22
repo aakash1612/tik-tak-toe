@@ -2,10 +2,18 @@
 
 const activeRooms = new Map();
 
-let roomIdCounter = 0;
-function generateRoomId() {
-    roomIdCounter++;
-    return `room_${roomIdCounter}`;
+function generateRoomKey() {
+    // Generates a 5-character key like 'A1B2C'
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let key = '';
+    for (let i = 0; i < 5; i++) {
+        key += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    // Ensure the key is unique (essential)
+    if (activeRooms.has(key)) {
+        return generateRoomKey(); // Recurse if collision occurs (unlikely with 5 chars)
+    }
+    return key;
 }
 
 function checkWinner(board) {
@@ -35,17 +43,22 @@ function checkWinner(board) {
  * @param {string} [gameName='Unnamed Game'] An optional name for the game.
  * @returns {{roomId: string, room: object}} The ID and initial state of the created room.
  */
+// gameManager.js
+
 function createRoom(creatorUserId, creatorUsername, creatorSocketId, gameName = 'Unnamed Game') {
-    const roomId = generateRoomId();
+    // ✅ Use the new random key
+    const roomId = generateRoomKey(); 
+    
     const newRoom = {
         id: roomId,
         name: gameName,
+        // ... (rest of the room properties remain the same)
         players: [{ userId: creatorUserId, username: creatorUsername, socketId: creatorSocketId }],
         board: Array(9).fill(null),
-        turn: creatorUserId, // Creator starts
+        turn: creatorUserId, 
         status: 'waiting',
         symbols: {},
-        rematchRequests: new Set() // To track rematch requests by userId
+        rematchRequests: new Set()
     };
     activeRooms.set(roomId, newRoom);
     console.log(`🎮 Room created: ${roomId} by ${creatorUsername} (${creatorUserId}) - Socket: ${creatorSocketId}`);
@@ -64,7 +77,7 @@ function joinRoom(roomId, playerUserId, playerUsername, playerSocketId) {
     const room = activeRooms.get(roomId);
 
     if (!room) {
-        return { success: false, message: 'Room not found.' };
+        return { success: false, message: 'Invalid room key or room not found.' };
     }
 
     // Reject if room is full AND the player is NOT already in it (reconnecting)
@@ -207,19 +220,20 @@ function deleteRoom(roomId) {
 }
 
 function getAvailableRooms() {
-    const available = [];
-    for (const [roomId, room] of activeRooms.entries()) {
-        // Only show rooms that are waiting and have less than 2 players
-        if (room.status === 'waiting' && room.players.length < 2) {
-            available.push({
-                id: roomId,
-                name: room.name,
-                playerCount: room.players.length,
-                status: room.status
-            });
-        }
-    }
-    return available;
+    return [];
+    // const available = [];
+    // for (const [roomId, room] of activeRooms.entries()) {
+    //     // Only show rooms that are waiting and have less than 2 players
+    //     if (room.status === 'waiting' && room.players.length < 2) {
+    //         available.push({
+    //             id: roomId,
+    //             name: room.name,
+    //             playerCount: room.players.length,
+    //             status: room.status
+    //         });
+    //     }
+    // }
+    // return available;
 }
 
 /**

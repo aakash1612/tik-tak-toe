@@ -1,13 +1,19 @@
 /* Main container styling */
 .container {
+  /* NOTE: The comma was changed to a semicolon here to fix the original error */
   max-width: 700px;
   margin: 2rem auto;
   padding: 2rem;
-  background: linear-gradient(145deg, #1e1e2f, #2a2a40);
+  background: linear-gradient(145deg, #617080, #5a6539);
   border-radius: 12px;
+  border: 1px solid #121212;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
   font-family: 'Segoe UI', sans-serif;
-  color: #f5f5f5;
+  color: #121212;
+}
+
+body {
+    background-color: #9ea8ab;
 }
 
 /* Headings */
@@ -15,12 +21,16 @@ h2 {
   text-align: center;
   margin-bottom: 1rem;
   font-size: 2rem;
-  color: #00d9ff;
+  color: #1a1b1c;
 }
 
 h3 {
   color: #ffdd57;
   margin-top: 2rem;
+}
+.container p, 
+.container span {
+    color: #121212; 
 }
 
 /* Status message */
@@ -39,10 +49,10 @@ input[type="text"] {
   padding: 0.75rem;
   margin: 0.5rem 0 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px; /* Consistent rounded corners */
   font-size: 1rem;
-  background-color: #34344d;
-  color: #fff;
+  background-color: #efeff5;
+  color: #121212;
 }
 
 input::placeholder {
@@ -51,29 +61,21 @@ input::placeholder {
 
 /* Buttons */
 button {
-  background-color: #00d9ff;
+  background-color: #00ff66; /* Using a brighter green accent */
   color: #1e1e2f;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
+  padding: 0.7rem 1.4rem; /* Slightly larger padding */
+  border-radius: 8px; /* Consistent rounded corners */
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: bold;
   transition: all 0.2s ease;
 }
 
 button:hover {
-  background-color: #00b8d4;
-  transform: translateY(-1px);
-}
-
-/* Logout button */
-.logout-btn {
-  background-color: #ff4b5c;
-}
-
-.logout-btn:hover {
-  background-color: #e63946;
+  background-color: #00e65c; /* Brighter green hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Game list */
@@ -83,20 +85,20 @@ button:hover {
 }
 
 .game-item {
-  background-color: #2e2e45;
+  background-color: #2e4537;
   border-radius: 8px;
   padding: 12px 15px;
   margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .game-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Game status text */
