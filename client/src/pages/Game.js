@@ -100,28 +100,32 @@ function Game() {
   const handleMoveMade = useCallback(({ board: newBoard }) => setBoard(newBoard), []);
   const handleTurnUpdate = useCallback(({ turn: newTurnUserId }) => setTurn(newTurnUserId), []);
 
-  const handleGameOver = useCallback(
-    ({ winner }) => {
-      setGameOverWinner(winner);
-      setShowGameOverModal(true);
+  // src/pages/Game.js (Around line 123)
 
-      if (winner === 'Draw') {
-        setDrawsScore((prev) => prev + 1);
-      } else {
-        if (winner === 'X') {
-         // Increment the score for the 'X' player
-        setPlayer1Score((prev) => prev + 1);
-         } else if (winner === 'O') {
-          // Increment the score for the 'O' player
-         setPlayer2Score((prev) => prev + 1);
-          }
-      }
-      setGameStatusMessage('Game over. Please choose an option from the modal.');
-      setRematchStatus(null);
-      setOpponentRequestedRematch(false);
-    },
-    [myUserId, players]
-  );
+const handleGameOver = useCallback(
+    ({ winner }) => {
+      setGameOverWinner(winner);
+      setShowGameOverModal(true);
+
+      if (winner === 'Draw') {
+        setDrawsScore((prev) => prev + 1);
+      } else {
+        if (winner === 'X') {
+         // Increment the score for the 'X' player
+        setPlayer1Score((prev) => prev + 1);
+         } else if (winner === 'O') {
+          // Increment the score for the 'O' player
+         setPlayer2Score((prev) => prev + 1);
+          }
+      }
+      setGameStatusMessage('Game over. Please choose an option from the modal.');
+      setRematchStatus(null);
+      setOpponentRequestedRematch(false);
+    },
+    // ✅ The minimal list needed due to state setters
+    [setGameOverWinner, setShowGameOverModal, setDrawsScore, setPlayer1Score, setPlayer2Score, setGameStatusMessage, setRematchStatus, setOpponentRequestedRematch]
+);
+  
 
   const handlePlayerDisconnected = useCallback(
     ({ message }) => {
