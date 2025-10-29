@@ -23,9 +23,10 @@ const sendEmail = async (to, subject, htmlContent) => {
     return { success: true, messageId: info.messageId };
   } 
   catch (error) {
-    console.error('❌ Error sending email:', error);
-    return { success: false, error: error.message };
-  }
+  console.error('❌ Error sending email:', error);
+  console.error('Full error object:', JSON.stringify(error, null, 2));
+  return { success: false, error: error.message };
+}
 };
 
 module.exports = sendEmail;

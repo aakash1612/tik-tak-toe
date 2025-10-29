@@ -4,7 +4,7 @@ import socket from './socket';
 
 // Create Axios instance with backend base URL from .env
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL, // e.g., https://tik-tac-toe-backend-67xd.onrender.com
+  baseURL: process.env.REACT_APP_BACKEND_URL, 
   headers: {
     'Content-Type': 'application/json',
   },
