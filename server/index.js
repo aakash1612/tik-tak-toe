@@ -12,7 +12,7 @@ const gameManager = require('./utils/gameManager');
 const User = require('./models/User');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 const SERVER_URL = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
 
@@ -235,6 +235,12 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+console.log(`🌐 Environment variables check:`);
+console.log(`CLIENT_URL = ${CLIENT_URL}`);
+console.log(`SERVER_URL = ${SERVER_URL}`);
+console.log(`PORT = ${PORT}`);
+
+// ✅ Render-compatible port binding
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server listening on port ${PORT} (Render-compatible binding)`);
 });
