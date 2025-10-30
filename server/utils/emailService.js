@@ -1,18 +1,14 @@
 // server/utils/emailService.js
 
-const fetch = require("node-fetch"); // For making API requests
-
 const sendEmail = async (to, subject, htmlContent) => {
   try {
-    // Build the email payload
     const body = {
-      from: process.env.EMAIL_FROM, // The verified sender email in Resend
+      from: process.env.EMAIL_FROM,
       to,
       subject,
       html: htmlContent,
     };
 
-    // Send email using Resend API
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
