@@ -1,32 +1,39 @@
-const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVICE_HOST,
-  port: parseInt(process.env.EMAIL_SERVICE_PORT)||587,
-  secure: false, // Use 'true' if port is 465 (SMTPS), 'false' if 587 (STARTTLS)
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, 
-  },
-});
+// server/utils/emailService.js
+
+const fetch = require("node-fetch"); // For making API requests
 
 const sendEmail = async (to, subject, htmlContent) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    // Build the email payload
+    const body = {
+      from: process.env.EMAIL_FROM, // The verified sender email in Resend
       to,
-      subject: subject,
+      subject,
       html: htmlContent,
     };
 
-    let info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully:', info.messageId);
-    return { success: true, messageId: info.messageId };
-  } 
-  catch (error) {
-  console.error('❌ Error sending email:', error);
-  console.error('Full error object:', JSON.stringify(error, null, 2));
-  return { success: false, error: error.message };
-}
+    // Send email using Resend API
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || "Failed to send email");
+    }
+
+    console.log("✅ Email sent successfully via Resend:", data);
+    return { success: true, id: data.id };
+  } catch (error) {
+    console.error("❌ Error sending email:", error.message);
+    return { success: false, error: error.message };
+  }
 };
 
 module.exports = sendEmail;
