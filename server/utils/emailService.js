@@ -1,5 +1,4 @@
 // server/utils/emailService.js
-
 const sendEmail = async (to, subject, htmlContent) => {
   try {
     const body = {
@@ -19,6 +18,8 @@ const sendEmail = async (to, subject, htmlContent) => {
     });
 
     const data = await response.json();
+
+    console.log("📩 Resend API raw response:", data); // 👈 Add this line
 
     if (!response.ok) {
       throw new Error(data.error?.message || "Failed to send email");
