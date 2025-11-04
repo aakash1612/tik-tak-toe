@@ -5,10 +5,12 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 30000, // 30 s
-  greetingTimeout: 20000,
-  socketTimeout: 30000,
-  family: 4,                // ✅ force IPv4
+  pool: true,
+  maxConnections: 1,
+  rateLimit: 1,
+  connectionTimeout: 20000,
+  socketTimeout: 20000,
+  family: 4, // force IPv4
   tls: { rejectUnauthorized: false },
 });
 
