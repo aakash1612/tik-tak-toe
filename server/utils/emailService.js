@@ -1,38 +1,32 @@
-// emailService.js
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_SERVICE_HOST,
+  port: parseInt(process.env.EMAIL_SERVICE_PORT)||587,
+  secure: false, // Use 'true' if port is 465 (SMTPS), 'false' if 587 (STARTTLS)
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS, 
+  },
+});
 
-if (!process.env.RESEND_API_KEY) {
-  console.warn('⚠️ RESEND_API_KEY is not set. Emails will fail until you add it to env.');
-}
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-/**
- * sendEmail(to, subject, htmlContent)
- * - to: string (single recipient or array)
- * - subject: string
- * - htmlContent: string (HTML)
- *
- * Returns: { success: true, id } on success or { success: false, error } on failure
- */
 const sendEmail = async (to, subject, htmlContent) => {
   try {
-    const response = await resend.emails.send({
-      from: 'onboarding@resend.dev', // sandbox sender, no domain required
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
       to,
-      subject,
+      subject: subject,
       html: htmlContent,
-    });
+    };
 
-    // response typically contains an id and metadata
-    console.log('✅ Resend email queued/sent:', response);
-    return { success: true, id: response.id || null, raw: response };
-  } catch (err) {
-    console.error('❌ Resend send error:', err);
-    // Some errors are objects — try to return useful message
-    const message = err?.message || JSON.stringify(err);
-    return { success: false, error: message, raw: err };
-  }
+    let info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent successfully:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } 
+  catch (error) {
+  console.error('❌ Error sending email:', error);
+  console.error('Full error object:', JSON.stringify(error, null, 2));
+  return { success: false, error: error.message };
+}
 };
 
 module.exports = sendEmail;
