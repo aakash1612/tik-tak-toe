@@ -13,6 +13,10 @@ const SERVER_URL = process.env.SERVER_URL || 'http://localhost:5000';
 
 // 🔑 REGISTER Controller
 exports.register = async (req, res) => {
+    console.log("📥 RAW BODY RECEIVED:", req.body);
+    console.log("📥 USERNAME RECEIVED:", req.body.username);
+    console.log("📥 EMAIL RECEIVED:", req.body.email);
+    console.log("📥 PASSWORD RECEIVED:", req.body.password);
     const { username, email, password } = req.body;
     console.log("➡️ Registering user:", username, email);
 

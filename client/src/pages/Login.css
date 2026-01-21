@@ -1,0 +1,81 @@
+/* ===============================
+   LOGIN PAGE STYLES
+================================ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 460px;          /* ⬅️ slightly wider */
+  padding: 42px;             /* ⬅️ more breathing space */
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  color: #e5e7eb;
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 2rem;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 14px;             /* ⬅️ slightly bigger inputs */
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.9);
+}
+
+.login-card button {
+  width: 100%;
+  padding: 14px;             /* ⬅️ bigger button */
+  border-radius: 10px;
+  background: #00ff66;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.login-card button:hover {
+  background: #00e65c;
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   SPACING + LINKS (NEW)
+================================ */
+
+/* Space between button and links */
+.login-card .auth-links {
+  margin-top: 22px;
+  text-align: center;
+}
+
+/* Link text */
+.login-card a {
+  color: #38bdf8;            /* ⬅️ sky blue */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-card a:hover {
+  text-decoration: underline;
+}
+
+/* Subtle divider spacing */
+.login-card .auth-links p {
+  margin-top: 10px;
+  color: #cbd5f5;
+}

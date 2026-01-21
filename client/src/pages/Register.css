@@ -1,0 +1,82 @@
+/* ===============================
+   REGISTER PAGE STYLES
+================================ */
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 36px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  color: #e5e7eb;
+}
+
+.register-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #e5e7eb;
+}
+
+.register-card input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.9);
+}
+
+.register-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #00ff66;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.register-card button:hover {
+  background: #00e65c;
+  transform: translateY(-1px);
+}
+
+.register-card p {
+  text-align: center;
+  margin-top: 15px;
+  color: #cbd5f5;
+}
+
+.register-card a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+
+.register-card a:hover {
+  text-decoration: underline;
+}
+
+/* Messages */
+.register-card .error-message {
+  color: #ff4b5c;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.register-card .success-message {
+  color: #00ff99;
+  text-align: center;
+  margin-bottom: 10px;
+}

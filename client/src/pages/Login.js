@@ -1,6 +1,7 @@
 import { Link , useNavigate  } from 'react-router-dom';
 import React, { useState } from 'react';
 import api from '../api'; 
+import './Login.css';
 
 const Login = ({ onAuth }) => {
   const [username, setUsername] = useState('');
@@ -37,8 +38,10 @@ const Login = ({ onAuth }) => {
   };
 
   return (
-    <div className="container">
+  <div className="login-page">
+    <div className="login-card">
       <h2>Login</h2>
+
       <form onSubmit={handleLogin}>
         <input
           type="text"
@@ -48,9 +51,9 @@ const Login = ({ onAuth }) => {
             setUsername(e.target.value);
             setLoginError('');
           }}
-          required 
+          required
         />
-        <br />
+
         <input
           type="password"
           value={password}
@@ -61,20 +64,25 @@ const Login = ({ onAuth }) => {
           }}
           required
         />
-        <br />
+
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+
       {loginError && <p className="error-message">{loginError}</p>}
+      <div className="auth-links">
       <p>
         Don’t have an account? <Link to="/register">Register here</Link>
       </p>
       <p>
         <Link to="/forgot-password">Forgot Password?</Link>
       </p>
+      </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Login;

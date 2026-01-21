@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import socket from '../socket';
+import socket from '../../socket';
 import './AppHeader.css'; // 🔑 Import the new, local CSS file
 
 // --- User Profile Modal Component ---
@@ -44,7 +44,9 @@ const AppHeader = ({ username, userId }) => {
     return (
         <header className="app-header">
             <div className="header-content">
-                <h1 className="logo">Tic-Tac-Toe Arena</h1>
+                <h1 className="logo">
+                     🎮 Tic-Tac-Toe <span>Arena</span>
+                </h1>
                 <div className="user-controls">
                     <button onClick={handleLogout} className="logout-btn header-btn">Logout</button>
                     

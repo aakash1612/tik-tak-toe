@@ -1,5 +1,4 @@
 // tik-tok-toe/server/index.js
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -10,9 +9,11 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const gameManager = require('./utils/gameManager');
 const User = require('./models/User');
+const sendEmail = require('./utils/emailService');
+
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 const SERVER_URL = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
 
@@ -23,6 +24,28 @@ app.use(cors({
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+
+// ✅ TEMP: SendGrid test route (remove later)
+// app.get('/test-mail', async (req, res) => {
+//     try {
+//         const result = await sendEmail(
+//             "varshneyakash46@gmail.com",
+//             "SendGrid Test (Local)",
+//             "<h2>SendGrid email is working locally 🎉</h2>"
+//         );
+
+//         res.json({
+//             success: true,
+//             result
+//         });
+//     } catch (err) {
+//         res.status(500).json({
+//             success: false,
+//             error: err.message
+//         });
+//     }
+// });
+
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

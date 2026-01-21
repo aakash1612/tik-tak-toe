@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import socket from '../socket';
-import AppHeader from '../pages/AppHeader'; // your header component
+import './Game.css';
+import AppHeader from './Components/AppHeader'; // your header component
 
 function Game() {
   const { roomId } = useParams();
@@ -292,7 +293,7 @@ function Game() {
         </div>
 
         <div className="game-layout">
-          <div className="game-left">
+          <div className="game-left glass-card">
            <h1 className="game-title">
                {myUsername} ({myPlayer?.symbol}) vs {opponentPlayer?.username || 'Opponent'} ({opponentPlayer?.symbol})
            </h1>
@@ -331,7 +332,7 @@ function Game() {
           </div>
 
           {/* ✅ Chat */}
-          <div className="game-right">
+          <div className="game-right glass-card">
             <div className="chat-container">
               <h3>In-Game Chat</h3>
               <div className="messages-display">

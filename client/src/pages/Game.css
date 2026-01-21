@@ -1,0 +1,371 @@
+/* ===============================
+   GAME PAGE STYLES
+================================ */
+
+.game-container {
+  position: relative;
+  width: 100%;
+  flex: 1;
+}
+
+/* Layout */
+.game-layout {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  gap: 30px;
+  height: calc(100vh - 70px);
+}
+
+/* Left side */
+.game-left {
+  flex: 0 0 65%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Right side */
+.game-right {
+  flex: 0 0 35%;
+  display: flex;
+}
+
+/* Title */
+.game-title {
+  color: #e5e7eb;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+/* Status */
+.status-message {
+  color: #38bdf8;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Turn indicator */
+.turn-indicator {
+  position: absolute;
+  top: 85px;
+  left: 25px;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  font-size: 0.95rem;
+}
+
+.turn-indicator.your-turn {
+  color: #00ff88;
+  border: 2px solid #00ff88;
+  background: rgba(0, 255, 136, 0.15);
+}
+
+.turn-indicator.opponent-turn {
+  color: #ff4b5c;
+  border: 2px solid #ff4b5c;
+  background: rgba(255, 75, 92, 0.15);
+}
+
+/* Scoreboard */
+.player-scores {
+  margin: 12px 0;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(0, 255, 153, 0.35);
+  box-shadow: 0 0 14px rgba(0, 255, 153, 0.2);
+}
+
+/* Each score block */
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+}
+
+/* Label (Wins / Losses / Draws) */
+.score-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 2px;
+  letter-spacing: 0.3px;
+}
+
+/* Number */
+.score-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Colors */
+.score-win .score-value {
+  color: #00ff99;
+}
+
+.score-loss .score-value {
+  color: #ff4b5c;
+}
+
+.score-draw .score-value {
+  color: #ffd700;
+}
+
+/* Board */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 120px);
+  grid-template-rows: repeat(3, 120px);
+  gap: 8px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+}
+
+.cell {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  font-size: 3rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cell:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.cell.X { color: #3b82f6; }
+.cell.O { color: #ef4444; }
+
+/* ===============================
+   CHAT SECTION (FINAL FIX)
+================================ */
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: rgba(30, 41, 59, 0.75); /* lighter */
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 16px 35px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.chat-container h3 {
+  text-align: center;
+  padding: 12px;
+  color: #e5e7eb;
+  background: rgba(255,255,255,0.03);
+}
+
+/* Messages area */
+.messages-display {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Message bubble */
+.message-item {
+  max-width: 70%;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Timestamp (subscript style) */
+.message-item .timestamp {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  align-self: flex-end; /* ✅ always bottom-right */
+}
+
+/* My message */
+.my-message {
+  margin-left: auto;
+  background: #dcf8c6;
+  color: #111827;
+}
+
+/* Opponent message */
+.opponent-message {
+  background: rgba(255,255,255,0.95);
+  color: #111827;
+}
+
+/* Chat input */
+.message-input-form {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+  background: #ffffff;
+}
+
+.message-input-form input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.message-input-form button {
+  background: #3b82f6;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 18px;
+  border: none;
+  cursor: pointer;
+}
+
+/* ===============================
+   GAME OVER MODAL (POPUP)
+================================ */
+
+/* Overlay */
+.game-over-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Modal box */
+.game-over-modal {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 36px;
+  border-radius: 22px;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+  text-align: center;
+  color: #e5e7eb;
+  animation: popIn 0.35s ease;
+}
+
+/* Title */
+.game-over-modal h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+/* Winner / Draw text */
+.winner-text {
+  color: #00ff99;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.loser-text {
+  color: #ff4b5c;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.draw-text {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+/* Winner name */
+.game-over-modal p {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #cbd5f5;
+}
+
+/* Buttons container */
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+/* Rematch button */
+.rematch-btn {
+  background: #00ff66;
+  color: #0f172a;
+  border: none;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.rematch-btn:hover {
+  background: #00e65c;
+  transform: translateY(-1px);
+}
+
+.rematch-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Lobby button */
+.lobby-btn {
+  background: #38bdf8;
+  color: #0f172a;
+  border: none;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.lobby-btn:hover {
+  background: #0ea5e9;
+  transform: translateY(-1px);
+}
+
+/* Rematch status text */
+.rematch-message {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* Animation */
+@keyframes popIn {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

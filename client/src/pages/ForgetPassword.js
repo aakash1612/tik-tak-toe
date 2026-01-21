@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api'; 
+import './ForgetPassword.css';
 
 function ForgotPassword() {
   const [username, setUsername] = useState('');
@@ -31,8 +32,10 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="container">
+  <div className="forgot-page">
+    <div className="forgot-card">
       <h2>Forgot Password</h2>
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -40,22 +43,24 @@ function ForgotPassword() {
           value={username}
           onChange={(e) => {
             setUsername(e.target.value);
-            setError('');   // Clear messages on input change
-            setMessage(''); // Clear messages on input change
+            setError('');
+            setMessage('');
           }}
           required
         />
+
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Sending Request...' : 'Request Password Reset'}
         </button>
       </form>
 
-      {/* Display messages using CSS classes for better styling consistency */}
+      {/* Messages */}
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
-
     </div>
-  );
+  </div>
+);
+
 }
 
 export default ForgotPassword;

@@ -1,34 +1,27 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Use service instead of manual host/port
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
   },
-  debug: true,
 });
 
-const sendEmail = async (to, subject, htmlContent) => {
+const sendEmail = async (to, subject, html) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await transporter.sendMail({
+      from: '"Tic-Tac-Toe" <no-reply@tictactoe.dev>',
       to,
-      subject: subject,
-      html: htmlContent,
-    };
-    
-    let info = await transporter.sendMail(mailOptions).catch((error) => {
-      console.error('❌ Transporter sendMail error:', error);
-      throw error;
+      subject,
+      html,
     });
-    
-    console.log('✅ Email sent successfully:', info.messageId);
-    return { success: true, messageId: info.messageId };
+
+    return { success: true };
   } catch (error) {
-    console.error('❌ Error sending email:', error);
-    console.error('Full error object:', JSON.stringify(error, null, 2));
-    return { success: false, error: error.message };
+    console.error("❌ Email send failed:", error);
+    return { success: false, error };
   }
 };
 

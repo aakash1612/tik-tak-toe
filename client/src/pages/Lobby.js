@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import socket from '../socket';
-import AppHeader from '../pages/AppHeader';
+import AppHeader from './Components/AppHeader';
 import './Lobby.css'; // Ensure you have your CSS for .modal-overlay, etc.
 
 const Lobby = () => {
@@ -178,50 +178,56 @@ const Lobby = () => {
             )}
             
             {/* --- Main Lobby Content --- */}
-            <div className="container">
-                <h2>Welcome to the Arena</h2>
-                <p>Hello, <strong>{myUsername || 'Guest'}</strong>! Create a new private game or join a friend!</p>
-                {lobbyMessage && <p className="status-message">{lobbyMessage}</p>}
-                
-                {/* Only show the options if the modal is NOT open */}
-                {!isWaitingModalOpen && (
-                    <div className="lobby-options-container">
-                        
-                        {/* 1. Create New Game */}
-                        <h3>1. Create New Game Room</h3>
-                        <div className="create-game-inputs" style={{ marginBottom: '30px' }}> 
-                            <input
-                                type="text"
-                                value={newGameName}
-                                // Placeholder indicates it's optional
-                                placeholder="Enter a name for your game (optional)"
-                                onChange={(e) => setNewGameName(e.target.value)}
-                            />
-                            <button onClick={handleCreateGame}>Create Game</button>
-                        </div>
-                        
-                        <hr style={{ margin: '2rem 0', borderColor: '#ccc' }} />
+           <div className="lobby-page">
+  <div className="lobby-card">
+    <h2 className="lobby-title">Welcome to the Arena</h2>
+    <p className="lobby-subtitle">
+      Create a new private game or join a friend!
+    </p>
 
-                        {/* 2. Join Game by Key */}
-                        <h3>2. Join Game by Key</h3>
-                        <div className="join-game-inputs">
-                            <input
-                                type="text"
-                                value={joinKey}
-                                placeholder="Enter 5-character Room Key (e.g., A1B2C)"
-                                maxLength={5}
-                                onChange={(e) => { 
-                                    setJoinKey(e.target.value.toUpperCase()); 
-                                    setLobbyMessage('');
-                                }}
-                            />
-                            <button onClick={handleJoinByKey} disabled={joinKey.length !== 5}>
-                                Join Game
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
+    {lobbyMessage && <p className="status-message">{lobbyMessage}</p>}
+
+    {!isWaitingModalOpen && (
+      <div className="lobby-grid">
+
+        {/* Create Game */}
+        <div className="lobby-section">
+          <h3>Create Game</h3>
+          <input
+            type="text"
+            placeholder="Game name (optional)"
+            value={newGameName}
+            onChange={(e) => setNewGameName(e.target.value)}
+          />
+          <button onClick={handleCreateGame} className="primary-btn">
+            Create Game
+          </button>
+        </div>
+
+        {/* Join Game */}
+        <div className="lobby-section">
+          <h3>Join Game</h3>
+          <input
+            type="text"
+            placeholder="Enter room key"
+            maxLength={5}
+            value={joinKey}
+            onChange={(e) => setJoinKey(e.target.value.toUpperCase())}
+          />
+          <button
+            onClick={handleJoinByKey}
+            disabled={joinKey.length !== 5}
+            className="secondary-btn"
+          >
+            Join Game
+          </button>
+        </div>
+
+      </div>
+    )}
+  </div>
+</div>
+
         </>
     );
 };

@@ -1,108 +1,112 @@
-/* Main container styling */
-.container {
-  /* NOTE: The comma was changed to a semicolon here to fix the original error */
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: linear-gradient(145deg, #617080, #5a6539);
-  border-radius: 12px;
-  border: 1px solid #121212;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-  font-family: 'Segoe UI', sans-serif;
-  color: #121212;
-}
-
+/* Page background */
 body {
-    background-color: #9ea8ab;
+  background: radial-gradient(circle at top, #1f2933, #0f172a);
+  font-family: 'Segoe UI', sans-serif;
 }
 
-/* Headings */
-h2 {
+/* Centering */
+.lobby-page {
+  min-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main card */
+.lobby-card {
+  width: 900px;
+  padding: 2.5rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Titles */
+.lobby-title {
   text-align: center;
-  margin-bottom: 1rem;
-  font-size: 2rem;
-  color: #1a1b1c;
+  font-size: 2.4rem;
+  color: #ffffff;
 }
 
-h3 {
-  color: #ffdd57;
-  margin-top: 2rem;
-}
-.container p, 
-.container span {
-    color: #121212; 
+.lobby-subtitle {
+  text-align: center;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
 }
 
-/* Status message */
-.status-message {
-  background-color: rgba(0, 217, 255, 0.15);
-  border-left: 4px solid #00d9ff;
-  padding: 0.75rem;
-  border-radius: 6px;
+/* Grid */
+.lobby-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+/* Section cards */
+.lobby-section {
+  background: rgba(15, 23, 42, 0.75);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.lobby-section h3 {
   margin-bottom: 1rem;
-  font-weight: 500;
+  color: #e5e7eb;
 }
 
 /* Inputs */
-input[type="text"] {
+.lobby-section input {
   width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0 1rem;
+  padding: 0.9rem;
+  border-radius: 10px;
   border: none;
-  border-radius: 8px; /* Consistent rounded corners */
+  margin-bottom: 1rem;
+  background: #e5e7eb;
   font-size: 1rem;
-  background-color: #efeff5;
-  color: #121212;
-}
-
-input::placeholder {
-  color: #bbb;
 }
 
 /* Buttons */
-button {
-  background-color: #00ff66; /* Using a brighter green accent */
-  color: #1e1e2f;
-  border: none;
-  padding: 0.7rem 1.4rem; /* Slightly larger padding */
-  border-radius: 8px; /* Consistent rounded corners */
-  cursor: pointer;
-  font-size: 1rem;
+.primary-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #022c22;
   font-weight: bold;
-  transition: all 0.2s ease;
+  padding: 0.9rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
 }
 
-button:hover {
-  background-color: #00e65c; /* Brighter green hover */
+.secondary-btn {
+  width: 100%;
+  background: transparent;
+  border: 2px solid #3b82f6;
+  color: #3b82f6;
+  padding: 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Game list */
-.game-list {
-  list-style: none;
-  padding: 0;
+/* Status */
+.status-message {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #38bdf8;
 }
 
-.game-item {
-  background-color: #2e4537;
-  border-radius: 8px;
-  padding: 12px 15px;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.game-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Game status text */
-.game-status {
-  color: #bbb;
-  font-size: 0.9rem;
+/* Mobile */
+@media (max-width: 768px) {
+  .lobby-card {
+    width: 95%;
+  }
+  .lobby-grid {
+    grid-template-columns: 1fr;
+  }
 }
