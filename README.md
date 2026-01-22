@@ -107,3 +107,4 @@ Currently, the project uses **Mailtrap** for email testing purposes:
 git clone <repository_url>
 cd tic-tac-toe
 
+
