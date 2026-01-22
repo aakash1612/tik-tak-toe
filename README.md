@@ -92,8 +92,9 @@ Mailtrap is used only for development to avoid sending real emails.
 
 ### Step 1: Clone the Repository
 ```bash
-git clone <repository_url>
+git clone https://github.com/aakash1612/tik-tak-toe tic-tac-toe
 cd tic-tac-toe
+
 ```
 ### Step 2: Install Dependencies
 ```bash
@@ -115,5 +116,6 @@ Start Frontend (Terminal 2)
 cd client
 npm start
 Frontend runs on:http://localhost:3000
+
 
 
