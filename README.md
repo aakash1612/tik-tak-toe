@@ -10,7 +10,7 @@ Play live with another user using a room-based lobby system, real-time updates, 
 🔗 **Frontend (Live Demo):**  
 https://tik-tok-toe-frontend.netlify.app/login
 
-> ⚠️ Note: The backend is deployed separately. The app works fully when both frontend and backend are running.
+> ⚠️ Note: The backend is deployed separately. The application works fully when both frontend and backend are running.
 
 ---
 
@@ -19,9 +19,9 @@ https://tik-tok-toe-frontend.netlify.app/login
 You can use the following **pre-created demo users** to explore the application without email verification:
 
 | Username | Password |
-|--------|----------|
-| user1  | 123456   |
-| user2  | 123456   |
+|---------|----------|
+| user1   | 123456   |
+| user2   | 123456   |
 
 ✅ Both users are verified and ready to log in  
 ✅ Useful for quick testing and interviews  
@@ -30,40 +30,31 @@ You can use the following **pre-created demo users** to explore the application 
 
 ## ✨ Features
 
-- **User Authentication**
-  - Register, Login, Logout
-  - JWT-based secure authentication
-- **Password Reset via Email**
-  - Uses email verification workflow
-- **Real-time Multiplayer Gameplay**
-  - Powered by Socket.IO
-- **Lobby / Room System**
-  - Create a unique room ID
-  - Only two players allowed per room
-- **Turn-based Game Logic**
-  - Win, lose, and draw detection
-- **Rematch Support**
-  - Replay without leaving the room
-- **In-game Chat**
-  - Live chat between players
-- **Responsive UI**
-  - Works across desktop and mobile devices
+- User Authentication (Register, Login, Logout)
+- JWT-based secure authentication
+- Password reset via email
+- Real-time multiplayer gameplay using Socket.IO
+- Lobby / Room system (unique room ID)
+- Turn-based game logic (win, lose, draw)
+- Rematch functionality
+- In-game chat
+- Responsive UI for desktop and mobile
 
 ---
 
 ## 🚀 Technologies Used
 
-### 🖥 Backend (Server)
+### Backend
 - Node.js
 - Express.js
 - MongoDB
 - Mongoose
 - Socket.IO
-- bcryptjs (password hashing)
-- jsonwebtoken (JWT authentication)
-- nodemailer (email handling)
+- bcryptjs
+- jsonwebtoken
+- nodemailer
 
-### 🌐 Frontend (Client)
+### Frontend
 - React
 - React Router
 - Axios
@@ -72,39 +63,57 @@ You can use the following **pre-created demo users** to explore the application 
 
 ---
 
-## 📧 Email Service Note (Important)
+## 📧 Email Service Note
 
-Currently, the project uses **Mailtrap** for email testing purposes:
+This project currently uses **Mailtrap** for email testing:
 
 - Registration verification emails
 - Password reset emails
 
-🔒 **Why Mailtrap?**
-- Safe for development
-- Prevents sending real emails during testing
+Mailtrap is used only for development to avoid sending real emails.
 
-💡 **Production Ready**
-- Mailtrap can be easily replaced with real email services like:
-  - Gmail SMTP
-  - SendGrid
-  - Amazon SES
+🔄 For production, Mailtrap can be replaced with:
+- Gmail SMTP
+- SendGrid
+- Amazon SES
 
-> The email logic is already implemented — only credentials need to be updated for production use.
+> Email functionality is already implemented — only credentials need to be changed.
 
 ---
 
 ## ⚙️ Installation & Setup (Local Development)
 
-### ✅ Prerequisites
-- Node.js (v14+)
+### Prerequisites
+- Node.js (v14 or higher)
 - npm
-- MongoDB (Local or MongoDB Atlas)
+- MongoDB (local or MongoDB Atlas)
 
 ---
 
-### 1️⃣ Clone the Repository
+### Step 1: Clone the Repository
 ```bash
 git clone <repository_url>
 cd tic-tac-toe
+```
+### Step 2: Install Dependencies
+```bash
+Backend
+cd server
+npm install
+Frontend
+cd ../client
+npm install
+```
+### Step 3: Run the Application
+```bash
+Start Backend (Terminal 1)
+cd server
+npm start
+Backend runs on: http://localhost:5000
+
+Start Frontend (Terminal 2)
+cd client
+npm start
+Frontend runs on:http://localhost:3000
 
 
