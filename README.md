@@ -10,7 +10,10 @@ Play live with another user using a room-based lobby system, real-time updates, 
 🔗 **Frontend (Live Demo):**  
 https://tik-tok-toe-frontend.netlify.app/login
 
-> ⚠️ Note: The backend is deployed separately. The application works fully when both frontend and backend are running.
+>⚠️ Note: The backend is hosted on a free tier. If the app is inactive,
+the first request may take 10–30 seconds due to cold start.
+Subsequent requests are fast.
+
 
 ---
 
@@ -116,6 +119,7 @@ Start Frontend (Terminal 2)
 cd client
 npm start
 Frontend runs on:http://localhost:3000
+
 
 
 
