@@ -221,19 +221,6 @@ function deleteRoom(roomId) {
 
 function getAvailableRooms() {
     return [];
-    // const available = [];
-    // for (const [roomId, room] of activeRooms.entries()) {
-    //     // Only show rooms that are waiting and have less than 2 players
-    //     if (room.status === 'waiting' && room.players.length < 2) {
-    //         available.push({
-    //             id: roomId,
-    //             name: room.name,
-    //             playerCount: room.players.length,
-    //             status: room.status
-    //         });
-    //     }
-    // }
-    // return available;
 }
 
 /**

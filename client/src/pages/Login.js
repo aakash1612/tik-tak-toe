@@ -16,7 +16,7 @@ const Login = ({ onAuth }) => {
     setIsLoading(true);
     try {
       const res = await api.post('/api/auth/login', {
-        username,
+        username : username.trim(),
         password,
       });
 
@@ -74,9 +74,6 @@ const Login = ({ onAuth }) => {
       <div className="auth-links">
       <p>
         Don’t have an account? <Link to="/register">Register here</Link>
-      </p>
-      <p>
-        <Link to="/forgot-password">Forgot Password?</Link>
       </p>
       </div>
     </div>

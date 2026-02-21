@@ -9,7 +9,6 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const gameManager = require('./utils/gameManager');
 const User = require('./models/User');
-const sendEmail = require('./utils/emailService');
 
 
 const app = express();
@@ -24,28 +23,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
-
-// ✅ TEMP: SendGrid test route (remove later)
-// app.get('/test-mail', async (req, res) => {
-//     try {
-//         const result = await sendEmail(
-//             "varshneyakash46@gmail.com",
-//             "SendGrid Test (Local)",
-//             "<h2>SendGrid email is working locally 🎉</h2>"
-//         );
-
-//         res.json({
-//             success: true,
-//             result
-//         });
-//     } catch (err) {
-//         res.status(500).json({
-//             success: false,
-//             error: err.message
-//         });
-//     }
-// });
-
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

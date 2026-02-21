@@ -20,27 +20,21 @@ function Register({ onAuth }) {
     setIsLoading(true);
 
     try {
-      const res = await api.post('/api/auth/register', {
-        username,
-        email,
+      await api.post('/api/auth/register', {
+        username : username.trim(),
+        email : email.trim(),
         password,
       });
+      if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setIsLoading(false);
+      return;
+        }
+    setSuccess('Registration successful! Redirecting to login...');
 
-      if(res.data.requiresVerification){
-          setSuccess(`Check your inbox! A verification link has been sent to ${email}. Please verify your email before logging in.`);
-      }
-      else{
-        localStorage.setItem('accessToken', res.data.accessToken);
-        localStorage.setItem('refreshToken', res.data.refreshToken);
-        setSuccess(`Registration successful! Redirecting...`);
-        setTimeout(() => {
-          onAuth();
-          navigate('/lobby');
-        }, 1000);
-      }
-      
-
-      
+    setTimeout(() => {
+    navigate('/login');
+  }, 1000);    
 
     } catch (err) {
       console.error('Registration error:', err);
